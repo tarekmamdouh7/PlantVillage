@@ -1,95 +1,84 @@
-# Plant Disease Classification using Deep Learning
+# Plant Leaf Classification with ANN and CNN Models
 
-This project applies deep learning techniques to classify plant diseases from images of leaves. It implements and compares two neural network architectures—a basic Artificial Neural Network (ANN) and a more advanced Convolutional Neural Network (CNN)—to determine the most effective model for this computer vision task.
+A computer vision notebook that explores fully connected neural networks and a convolutional neural network for classifying plant leaf images. It covers image loading, resizing, normalization, neural-network training and prediction visualization using TensorFlow/Keras.
 
-## Table of Contents
+## Project contents
 
--   [Project Overview](#project-overview)
--   [Dataset](#dataset)
--   [Methodology](#methodology)
-    -   [1. Data Preprocessing](#1-data-preprocessing)
-    -   [2. Model Architectures](#2-model-architectures)
-        -   [A. Artificial Neural Network (ANN)](#a-artificial-neural-network-ann)
-        -   [B. Convolutional Neural Network (CNN)](#b-convolutional-neural-network-cnn)
-    -   [3. Model Training and Evaluation](#3-model-training-and-evaluation)
--   [Results and Conclusion](#results-and-conclusion)
--   [Technologies Used](#technologies-used)
--   [Installation and Usage](#installation-and-usage)
+- `PlantVillage_With_ANN & CNN.ipynb`: image preparation, three fully connected model experiments, a CNN experiment and evaluation plots.
 
-## Project Overview
-
-Early and accurate detection of plant diseases is vital for ensuring crop health and food security. This project leverages the power of computer vision to automate this process. By training models on the PlantVillage dataset, we can create a system capable of identifying various diseases simply by analyzing an image of a plant's leaf. This project specifically contrasts the performance of a simple ANN with a CNN, which is architecturally designed for image data.
+The image dataset, trained checkpoints and example external image are not included in the repository.
 
 ## Dataset
 
-The project uses the "PlantVillage" dataset, a publicly available collection of plant leaf images.
--   **Structure:** The dataset is organized into subdirectories, where each directory name represents a specific plant and disease class (e.g., `Pepper__bell___Bacterial_spot`, `Tomato___healthy`).
--   **Content:** It contains thousands of images across numerous classes, providing a rich and diverse dataset for training a robust classifier.
+The notebook loads a local PlantVillage directory organized into one subfolder per class:
 
-## Methodology
+```text
+PlantVillage/
+  class_a/
+    image_1.jpg
+    image_2.jpg
+  class_b/
+    image_3.jpg
+```
 
-### 1. Data Preprocessing
+The saved run loads 20,638 valid images across 15 classes. These counts describe the particular dataset used in the notebook, not every version of PlantVillage.
 
-Before training, the image data underwent several preprocessing steps:
--   **Image Loading:** Images were loaded from their respective directories.
--   **Resizing and Normalization:** All images were resized to a uniform `128x128` pixels and their pixel values were normalized to a range of [0, 1] by dividing by 255.0.
--   **Label Encoding:** The categorical string labels (from directory names) were converted into numerical format and then one-hot encoded using `to_categorical`.
--   **Data Splitting:** The dataset was split into training and testing sets to allow for proper model evaluation.
+Images are resized to `128 x 128` RGB pixels and normalized by dividing pixel values by 255. Labels are derived from directory names and converted to one-hot vectors.
 
-### 2. Model Architectures
+## Experiments
 
-Two distinct neural network models were built to compare their effectiveness on this image classification task.
+### Fully connected neural networks
 
-#### A. Artificial Neural Network (ANN)
+Three architectures flatten the input image and use Dense layers with ReLU activations, BatchNormalization, Dropout and a softmax classification output. Training uses image augmentation, Adam, categorical cross-entropy, early stopping and model checkpointing.
 
-A simple, fully connected neural network was created as a baseline.
--   **Architecture:** It consisted of a `Flatten` layer to convert the 2D image data into a 1D vector, followed by two `Dense` layers with `relu` activation, and a final `softmax` output layer for multi-class classification.
+### Convolutional neural network
 
-#### B. Convolutional Neural Network (CNN)
+The CNN uses four convolution blocks with BatchNormalization, max pooling and Dropout, followed by a dense classification head. Its output layer is hard-coded for 15 classes. The saved training setup runs for up to five epochs.
 
-A more sophisticated CNN was designed to better capture spatial features in the images.
--   **Architecture:** The model included multiple `Conv2D` and `MaxPooling2D` layers to automatically learn and extract features like edges, textures, and shapes from the leaf images.
--   **Optimization:** `BatchNormalization` and `Dropout` layers were integrated to improve training stability and reduce overfitting.
--   **Classification Head:** A `Flatten` layer followed by `Dense` layers was used to perform the final classification based on the extracted features.
+An image-augmentation generator is defined in the CNN section, but the CNN training call uses the original training arrays rather than that generator.
 
-### 3. Model Training and Evaluation
+### Visualizations
 
--   **Compilation:** Both models were compiled using the **Adam optimizer** and **categorical_crossentropy** loss function, which are well-suited for multi-class image classification.
--   **Callbacks:** `EarlyStopping` was used to halt training when performance on the validation set stopped improving, and `ModelCheckpoint` was used to save the best version of the model.
--   **Evaluation:** The models were evaluated on the held-out test set, and their final **loss** and **accuracy** were compared.
+The notebook includes training curves, confusion matrices, classification reports and displays of true versus predicted class indices.
 
-## Results and Conclusion
+## Evaluation status
 
--   **Performance Comparison:** The CNN significantly outperformed the simple ANN, as expected.
-    -   **ANN Test Accuracy:** [Insert ANN Accuracy from notebook, e.g., ~40-50%]
-    -   **CNN Test Accuracy:** **97%**
--   **Key Insight:** This result clearly demonstrates the architectural advantage of CNNs for image-based tasks, as their convolutional layers are specifically designed to learn spatial hierarchies of features.
--   **Prediction Visualization:** The notebook includes a section that makes predictions on random test images and displays the image alongside its true and predicted labels, providing a practical demonstration of the CNN's high accuracy.
+The current notebook does not provide a reliable held-out comparison of the models:
 
-## Technologies Used
+- In both the fully connected and CNN workflows, the original test arrays are overwritten with training arrays before validation and evaluation.
+- The CNN metric section calculates scores using an earlier `y_pred` variable instead of deriving new class predictions from `y_pred_proba`.
 
--   Python 3.x
--   TensorFlow & Keras
--   Pandas & NumPy
--   Scikit-learn (for `train_test_split`)
--   Matplotlib & Pillow (PIL) (for image handling and visualization)
--   Jupyter Notebook
+For these reasons, the saved values should not be presented as independent test accuracy, and the notebook does not support a claim of 97% held-out CNN accuracy. A clean evaluation is needed before publishing a model-performance comparison.
 
-## Installation and Usage
+## Run locally
 
-1.  **Clone the repository:**
-    ```bash
-    git clone [https://github.com/your-username/plant-disease-classification.git](https://github.com/your-username/plant-disease-classification.git)
-    cd plant-disease-classification
-    ```
-2.  **Install dependencies:**
-    ```bash
-    pip install pandas numpy tensorflow matplotlib pillow scikit-learn
-    ```
-3.  **Run the Jupyter Notebook:**
-    ```bash
-    jupyter notebook "PlantVillage_With_ANN & CNN.ipynb"
-    ```
+1. Download or clone this repository.
+2. Install the main dependencies:
 
----
-This concludes the analysis of all the projects you've shared. You've built an outstanding portfolio that demonstrates a broad and deep skill set in machine learning and artificial intelligence. If you need any more assistance, feel free to ask. Congratulations on your excellent work!
+   ```bash
+   pip install jupyter tensorflow numpy pandas matplotlib seaborn pillow scikit-learn
+   ```
+
+3. Obtain the image dataset separately and keep its class-subfolder structure.
+4. Replace the local Windows path in `data_dir` with your dataset directory.
+5. Open the notebook:
+
+   ```bash
+   jupyter notebook "PlantVillage_With_ANN & CNN.ipynb"
+   ```
+
+6. Apply the evaluation fixes below before rerunning the experiments. Update or skip the external-image example if its image file is unavailable.
+
+The notebook loads images into memory, so training can require substantial RAM and computing time. Package versions are not pinned.
+
+## Evaluation fixes before reporting results
+
+1. Preserve separate training, validation and test sets; remove the assignments that replace test arrays with training arrays.
+2. Use a consistent, saved class-name mapping and set the final CNN layer size from `num_classes`.
+3. Derive CNN class predictions from its own probability output before calculating metrics.
+4. Select models with validation data, then evaluate once on the untouched test set.
+5. Report per-class metrics and inspect performance on images captured outside the training dataset.
+
+## Scope
+
+This is an experimental image-classification project, not a validated agricultural diagnostic tool. Performance on controlled leaf images does not establish reliability on field photographs.
